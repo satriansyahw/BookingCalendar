@@ -1,41 +1,47 @@
 ﻿using BookingCalendar.Dto.Request;
+using BookingCalendar.Dto.Response;
 using BookingCalendar.Models.Domain;
 using BookingCalendar.Models.Instance;
 using BookingCalendar.Models.Interface;
 using BookingCalendar.Utils;
+using System.Globalization;
 
 namespace BookingCalendar.UseCase
 {
     public class CalendarUseCase
     {
         IKalendar calDao = InsKalendar.GetKalendar();
-        /* Task<Kalendar> Save(Kalendar item);
-        Task<bool> Update(Kalendar item);
-        Task<bool> IsAlreadyExist(Kalendar item);
-        Task<bool> Delete(int calendarId);
-        Task<Kalendar> Get(string userName, int calendarId);
-        Task<List<Kalendar>> Get(string userName);
-        Task<bool> IsAlreadyExistByEventName(string userName, string eventName);
-         */
-        public async Task<DataResponse> Save(Kalendar item)//post
+
+
+        public async Task<GenericResponse> CheckAvailibility(Kalendar item)
+        {
+            bool isAlreadyExists = await calDao.IsAlreadyExist(item);
+            if (!isAlreadyExists)
+                return new GenericResponse(true, "Event Date & time available");
+            else
+                return new GenericResponse(false, "Event Date & time conflicts");
+        }
+        public async Task<DataResponse> Save(Kalendar item)
         {
             bool isAlreadyExists = await calDao.IsAlreadyExist(item);
             Kalendar itemResult = await calDao.Save(item);
-            string existMessage = isAlreadyExists == true ? "but conflicted with other events " : string.Empty;
-            if (itemResult != null)
-                return new DataResponse(true, "Calendar event created " + existMessage, itemResult);
+            KalendarResDto result = this.CalendarResDtoToBuilder(itemResult);
+            string existMessage = isAlreadyExists == true ? " but conflict with other events " : string.Empty;
+            if (result.Id > 0)
+                return new DataResponse(true, "Calendar event created " + existMessage, result);
             else
                 return new DataResponse(false, "failed to create Calendar event ", null);
         }
-        public async Task<DataResponse> Update(Kalendar item)//patch
+        public async Task<DataResponse> Update(Kalendar item)
         {
-            Kalendar result = await calDao.Update(item);
+            Kalendar itemResult = await calDao.Update(item);
+            KalendarResDto result = this.CalendarResDtoToBuilder(itemResult);
             if (result != null)
                 return new DataResponse(true, "Calendar  event updated", result);
             else
                 return new DataResponse(false, "failed to update Calendar  event", null);
         }
-        public async Task<GenericResponse> Delete(int calendarId)//delete
+        public async Task<GenericResponse> Delete(long calendarId)
         {
             bool result = await calDao.Delete(calendarId);
             if (result)
@@ -65,13 +71,60 @@ namespace BookingCalendar.UseCase
         }
         public async Task<DataResponse> Get(string userName)
         {
-            List<Kalendar> result  =  await calDao.Get(userName);
+            List<KalendarResDto> result  =  await calDao.Get(userName);
             return new DataResponse(true, "Get all data by username", result);
         }
-        public async Task<DataResponse> Get(string userName,int calendarId)
+        public async Task<DataResponse> Get(string userName, long calendarId)
         {
-            Kalendar result = await calDao.Get(userName,calendarId);
+            Kalendar itemResult = await calDao.Get(userName,calendarId);
+            KalendarResDto result =   this.CalendarResDtoToBuilder(itemResult);
             return new DataResponse(true, "Get by CalendarId", result);
+        }
+        public Kalendar CalendarToBuilder(KalendarReqDto dto, string userName)
+        {
+            DateOnly.TryParse(dto.CalDate, out DateOnly calDate);
+            TimeOnly.TryParse(dto.CalTimeStart, out TimeOnly calTimeStart);
+            TimeOnly.TryParse(dto.CalTimeEnd, out TimeOnly calTimeEnd);
+
+            Kalendar item = new Kalendar();
+            item.CalTimeStart = calTimeStart;
+            item.CallTimeEnd = calTimeEnd;
+            item.IsAllDay = dto.IsAllDay;
+            item.EventName = dto.EventName;
+            item.CalDate = calDate;
+            item.UserName = userName;
+
+            return item;
+        }
+
+        public Kalendar CalendarToBuilder(KalendarWithIdReqDto dto, string userName)
+        {
+            DateOnly.TryParse(dto.CalDate, out DateOnly calDate);
+            TimeOnly.TryParse(dto.CalTimeStart, out TimeOnly calTimeStart);
+            TimeOnly.TryParse(dto.CalTimeEnd, out TimeOnly calTimeEnd);
+
+            Kalendar item = new Kalendar();
+            item.CalTimeStart = calTimeStart;
+            item.CallTimeEnd = calTimeEnd;
+            item.IsAllDay = dto.IsAllDay;
+            item.EventName = dto.EventName;
+            item.CalDate = calDate;
+            item.UserName = userName;
+            item.Id = dto.Id;
+
+            return item;
+        }
+        public KalendarResDto CalendarResDtoToBuilder(Kalendar item)
+        {
+            KalendarResDto result = new KalendarResDto();
+            result.CalTimeStart = item.CalTimeStart.ToString("HH:mm");
+            result.CalTimeEnd = item.CallTimeEnd.ToString("HH:mm");
+            result.IsAllDay = item.IsAllDay;
+            result.EventName = item.EventName;
+            result.CalDate = item.CalDate.ToString("yyyy-MM-dd");
+            result.UserName = item.UserName;
+            result.Id = item.Id;
+            return result;
         }
     }
 }

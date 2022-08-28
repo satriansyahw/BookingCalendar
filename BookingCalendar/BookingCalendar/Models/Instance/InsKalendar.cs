@@ -8,7 +8,7 @@ namespace BookingCalendar.Models.Instance
         private static DaoKalendar? daoKalendar;
         public static IKalendar GetKalendar()
         {
-            if (daoKalendar == null)
+           // if (daoKalendar == null)
                 daoKalendar = new DaoKalendar();
             return daoKalendar;
         }

@@ -1,4 +1,5 @@
-﻿using BookingCalendar.Models.Domain;
+﻿using BookingCalendar.Dto.Response;
+using BookingCalendar.Models.Domain;
 using BookingCalendar.Models.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -8,7 +9,7 @@ namespace BookingCalendar.Models.Dao
     public class DaoKalendar : IKalendar
     {
         private readonly EnitamContext context = new EnitamContext();
-        public async Task<bool> Delete(int calendarId)
+        public async Task<bool> Delete(long calendarId)
         {
             using (var transaction = context.Database.BeginTransaction())
             {
@@ -29,7 +30,7 @@ namespace BookingCalendar.Models.Dao
 
         }
 
-        public async Task<Kalendar> Get(string userName, int calendarId)
+        public async Task<Kalendar> Get(string userName, long calendarId)
         {
             var cal =  await (from a in context.Kalendar
                           where a.UserName == userName && a.Id == calendarId
@@ -37,11 +38,22 @@ namespace BookingCalendar.Models.Dao
             return cal;
         }
 
-        public async Task<List<Kalendar>> Get(string userName)
+        public async Task<List<KalendarResDto>> Get(string userName)
         {
-            List<Kalendar> listCall = await (from a in context.Kalendar
+            List<KalendarResDto> listCall = await (from a in context.Kalendar
                                   where a.UserName == userName
-                                  select a).ToListAsync();
+                                    select new KalendarResDto
+                                    {
+                                        CalDate = a.CalDate.ToString("yyyy-MM-dd"),
+                                        CalTimeStart = a.CalTimeStart.ToString("HH:mm"),
+                                        CalTimeEnd = a.CallTimeEnd.ToString("HH:mm"),
+                                        EventName = a.EventName,
+                                        Id = a.Id,
+                                        IsAllDay = a.IsAllDay,
+                                        UserName = a.UserName
+                                    }
+
+                                  ).ToListAsync();
             return listCall;
         }
 
@@ -53,7 +65,7 @@ namespace BookingCalendar.Models.Dao
                                   select a).ToListAsync();
             List<Kalendar> listCal = await (from a in context.Kalendar
                                        where a.UserName == item.UserName && a.CalDate == item.CalDate
-                                       && a.CalTimeStart >= item.CalTimeStart && a.CallTimeEnd <= a.CallTimeEnd
+                                       && a.CalTimeStart >= item.CalTimeStart && a.CallTimeEnd <= item.CallTimeEnd
                                        select a).ToListAsync();
             if(listCalAllDay !=null && listCalAllDay.Count > 0)
                 return true;
@@ -97,11 +109,12 @@ namespace BookingCalendar.Models.Dao
             {
                 try
                 {
-                    context.Add(item);
-                    context.Entry(item.EventName).State = EntityState.Modified;
-                    context.Entry(item.CalDate).State = EntityState.Modified;
-                    context.Entry(item.CalTimeStart).State = EntityState.Modified;
-                    context.Entry(item.CallTimeEnd).State = EntityState.Modified;
+                    context.Attach(item);
+                    context.Entry(item).Property("EventName").IsModified = true;
+                    context.Entry(item).Property("CalDate").IsModified = true;
+                    context.Entry(item).Property("CalTimeStart").IsModified = true;
+                    context.Entry(item).Property("CallTimeEnd").IsModified = true;
+                    context.Entry(item).Property("IsAllDay").IsModified = true;
                     await context.SaveChangesAsync();
                     transaction.Commit();
                     return item;
