@@ -5,7 +5,7 @@ namespace BookingCalendar.Models.Interface
     public interface IKalendar
     {
         Task<Kalendar> Save(Kalendar item);
-        Task<bool> Update(Kalendar item);
+        Task<Kalendar> Update(Kalendar item);
         Task<bool> IsAlreadyExist(Kalendar item);
         Task<bool> Delete(int calendarId);
         Task<Kalendar> Get(string userName, int calendarId);

@@ -91,7 +91,7 @@ namespace BookingCalendar.Models.Dao
             return item;
         }
 
-        public async Task<bool> Update(Kalendar item)
+        public async Task<Kalendar> Update(Kalendar item)
         {
             using (var transaction = context.Database.BeginTransaction())
             {
@@ -104,14 +104,14 @@ namespace BookingCalendar.Models.Dao
                     context.Entry(item.CallTimeEnd).State = EntityState.Modified;
                     await context.SaveChangesAsync();
                     transaction.Commit();
-                    return true;
+                    return item;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
                 }
             }
-            return false ;
+            return null;
         }
     }
 
