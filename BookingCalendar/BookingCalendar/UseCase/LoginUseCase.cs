@@ -16,22 +16,28 @@ namespace BookingCalendar.UseCase
     public class LoginUseCase
     {
         ILogin loginDao = InsLogin.GetLogin();
+        private readonly ILogger logger = LoggerFactory.Create(config =>
+        {
+            config.AddConsole();
+        }).CreateLogger<LoginUseCase>();
         public async Task<DataResponse> DoAuthentication(LoginReqDto reqDto,JwtSettings jwtSettings)
         {
             LoginResDto loginRes = new LoginResDto();
             string token = GenerateUserToken(reqDto.UserName,jwtSettings);
             if (!string.IsNullOrEmpty(token)){
+                logger.LogInformation("token not empty");
                 loginRes.AccessToken = token;
                 Login login = new Login { UserName = reqDto.UserName, IsActive = true };
                 login = await loginDao.Save(login);
-                if(login.Id > 0)
+                logger.LogInformation("token saved __"+login.Id.ToString());
+                if (login.Id > 0)
                     return new DataResponse( true, "token created", loginRes);
             }
             return new DataResponse(false, "failed token creation", loginRes);
         }
         private string GenerateUserToken(string userName, JwtSettings jwtSettings)
         {
-
+            logger.LogInformation("starting create token ");
             var now = DateTime.UtcNow;
             string _issuer = jwtSettings.ValidIssuer;
             string _keyToken = jwtSettings.IssuerSigningKey;

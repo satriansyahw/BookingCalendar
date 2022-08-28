@@ -17,17 +17,24 @@ namespace BookingCalendar.Controllers
     {
         CalendarUseCase calUseCase = new CalendarUseCase();
         GeneralHelper gh = new GeneralHelper();
+        private readonly ILogger logger;
 
+        public CalendarController( ILoggerFactory _logger)
+        { 
+            this.logger = _logger.CreateLogger<CalendarController>();
+        }
         [HttpGet]
         [Route("{calendarId:long}")]
         public async Task<DataResponse> GetById(long calendarId)
         {
+            logger.LogInformation("Get data Calendar By Id");
             string userName = gh.GetAuthInfo(this.HttpContext);
             return await calUseCase.Get(userName,calendarId);
         }
         [HttpGet]
         public async Task<DataResponse> Get()
         {
+            logger.LogInformation("Get data Calendar By User name");
             string userName = gh.GetAuthInfo(this.HttpContext);
             return await calUseCase.Get(userName);
         }
@@ -35,6 +42,7 @@ namespace BookingCalendar.Controllers
         [HttpPatch]
         public async Task<DataResponse> Patch([FromBody] KalendarWithIdReqDto dto)
         {
+            logger.LogInformation("Starting patching data ...");
             DateOnly.TryParse(dto.CalDate, out DateOnly calDate);
             if (!gh.IsValidDate(dto.CalDate))
                 return new DataResponse(false, "wrong cal date", null);
@@ -51,12 +59,13 @@ namespace BookingCalendar.Controllers
 
             string userName = gh.GetAuthInfo(this.HttpContext);
             Kalendar item = calUseCase.CalendarToBuilder(dto, userName);
-            return await calUseCase.Update(item);
+            return await calUseCase.Update(item); ;
 
         }
         [HttpPost]
         public async Task<DataResponse> Post([FromBody] KalendarReqDto dto)
         {
+            logger.LogInformation("Starting inserting data ...");
             DateOnly.TryParse(dto.CalDate, out DateOnly calDate);
             if(!gh.IsValidDate(dto.CalDate))
                 return new DataResponse(false, "wrong cal date", null);
@@ -79,6 +88,7 @@ namespace BookingCalendar.Controllers
         [Route("availibility")]
         public async Task<GenericResponse> PostCheckAvailability([FromBody] KalendarReqDto dto)
         {
+            logger.LogInformation("Starting checking availibility ...");
             DateOnly.TryParse(dto.CalDate, out DateOnly calDate);
             if (!gh.IsValidDate(dto.CalDate))
                 return new DataResponse(false, "wrong cal date", null);
@@ -101,6 +111,7 @@ namespace BookingCalendar.Controllers
         [Route("{calendarId:long}")]
         public async Task<GenericResponse> Delete(long calendarId)
         {
+            logger.LogInformation("Starting deleting data ...");
             string userName = gh.GetAuthInfo(this.HttpContext);
             return await calUseCase.Delete(calendarId);
         }

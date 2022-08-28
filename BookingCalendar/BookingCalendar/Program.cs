@@ -1,5 +1,6 @@
 using BookingCalendar.Extensions;
 using BookingCalendar.Models;
+using BookingCalendar.UseCase;
 using BookingCalendar.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddJWTTokenServices(builder.Configuration);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 
 builder.Services.AddControllers();

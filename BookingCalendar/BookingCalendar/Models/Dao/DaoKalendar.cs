@@ -9,6 +9,10 @@ namespace BookingCalendar.Models.Dao
     public class DaoKalendar : IKalendar
     {
         private readonly EnitamContext context = new EnitamContext();
+        private readonly ILogger logger = LoggerFactory.Create(config =>
+        {
+            config.AddConsole();
+        }).CreateLogger<DaoKalendar>();
         public async Task<bool> Delete(long calendarId)
         {
             using (var transaction = context.Database.BeginTransaction())
@@ -23,6 +27,7 @@ namespace BookingCalendar.Models.Dao
                 }
                 catch (Exception ex)
                 {
+                    logger.LogError(ex.StackTrace);
                     transaction.Rollback();
                 }
             }
@@ -97,6 +102,7 @@ namespace BookingCalendar.Models.Dao
                 }
                 catch (Exception ex)
                 {
+                    logger.LogError(ex.StackTrace);
                     transaction.Rollback();
                 }
             }
@@ -121,6 +127,7 @@ namespace BookingCalendar.Models.Dao
                 }
                 catch (Exception ex)
                 {
+                    logger.LogError(ex.StackTrace);
                     transaction.Rollback();
                 }
             }
