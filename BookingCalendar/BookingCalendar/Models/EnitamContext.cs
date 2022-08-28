@@ -1,4 +1,4 @@
-﻿using System;
+﻿using BookingCalendar.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -24,6 +24,7 @@ namespace BookingCalendar.Models
             //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Test");
         }
         public DbSet<Login> Login { get; set; } = null!;
+        public DbSet<Kalendar> Kalendar { get; set; } = null!;
     }
 }
 

@@ -9,11 +9,11 @@ namespace BookingCalendar.Models.Dao
 	public class DaoLogin: ILogin
 	{
         private readonly EnitamContext context = new EnitamContext();
-        public bool IsLoginIn(string userName)
+        public async Task<bool> IsLoginIn(string userName)
         {
-            var cari = (from a in context.Login
+            var cari = await (from a in context.Login
                         where a.UserName == userName
-                        select a).ToList();
+                        select a).ToListAsync();
             if (!cari.IsNullOrEmpty<Login>())
                 return true;
             else

@@ -1,4 +1,5 @@
-﻿using BookingCalendar.Models.Interface;
+﻿using BookingCalendar.Models.Instance;
+using BookingCalendar.Models.Interface;
 using BookingCalendar.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +46,7 @@ namespace BookingCalendar.Extensions
         {
             ILogin loginDao = InsLogin.GetLogin();
             string  un = context.Principal.Claims.Where(a => a.Type == "un").FirstOrDefault().Value.ToString();
-            bool isLogin =  loginDao.IsLoginIn(un);
+            bool isLogin =  loginDao.IsLoginIn(un).GetAwaiter().GetResult();
             if (!isLogin)
                 context.Fail("Error Token validation");
             return Task.CompletedTask;
