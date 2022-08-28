@@ -2,6 +2,7 @@
 using BookingCalendar.UseCase;
 using BookingCalendar.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace BookingCalendar.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyCorsPolicy")]
     [Authorize]
     public class LoginController : ControllerBase
     {
@@ -31,7 +33,7 @@ namespace BookingCalendar.Controllers
         [HttpGet]
         public string Get()
         {
-            return "asdf";
+            return "Hello World";
         }
     }
 }
