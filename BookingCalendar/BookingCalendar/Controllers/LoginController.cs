@@ -1,4 +1,6 @@
 ﻿using BookingCalendar.Dto.Request;
+using BookingCalendar.UseCase;
+using BookingCalendar.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +12,26 @@ namespace BookingCalendar.Controllers
     [Authorize]
     public class LoginController : ControllerBase
     {
+        LoginUseCase loginUseCase = new LoginUseCase();
+        private readonly JwtSettings jwtSettings;
+
+        public LoginController(JwtSettings jwtSettings)
+        {
+            this.jwtSettings = jwtSettings;
+        }
+
         [HttpPost]
         [AllowAnonymous]
-        public void Post([FromBody] LoginReqDto loginDto)
+        public async Task<DataResponse> Post([FromBody] LoginReqDto loginDto)
         {
-           //FIXME : will return Response with token
+           return  await loginUseCase.DoAuthentication(loginDto,this.jwtSettings);
+        }
+
+
+        [HttpGet]
+        public string Get()
+        {
+            return "asdf";
         }
     }
 }

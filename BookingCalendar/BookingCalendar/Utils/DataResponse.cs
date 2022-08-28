@@ -8,7 +8,7 @@ namespace BookingCalendar.Utils
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyOrder(2)]
         public object? Data { get; set; }
-        public DataResponse(Boolean? isSuccess, String? message, object? data)
+        public DataResponse(Boolean? isSuccess, String? message,object? data)
         {
             this.IsSuccess = isSuccess;
             this.Message = message;

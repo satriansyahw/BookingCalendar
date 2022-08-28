@@ -7,8 +7,6 @@ namespace BookingCalendar.Utils
 	public class GenericResponse
 	{
 
-        [JsonPropertyOrder(-1)]
-        public int? Status { get; set; } = 200;
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyOrder(0)]
         public Boolean? IsSuccess { get; set; }
