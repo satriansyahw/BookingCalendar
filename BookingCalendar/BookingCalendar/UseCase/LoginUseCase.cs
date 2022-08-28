@@ -2,6 +2,7 @@
 using BookingCalendar.Dto.Response;
 using BookingCalendar.Models;
 using BookingCalendar.Models.Dao;
+using BookingCalendar.Models.Instance;
 using BookingCalendar.Models.Interface;
 using BookingCalendar.Utils;
 using Microsoft.Extensions.Configuration;
@@ -15,13 +16,13 @@ namespace BookingCalendar.UseCase
     public class LoginUseCase
     {
         ILogin loginDao = InsLogin.GetLogin();
-        public async Task<DataResponse> DoAuthentication(LoginReqDto _reqDto,JwtSettings jwtSettings)
+        public async Task<DataResponse> DoAuthentication(LoginReqDto reqDto,JwtSettings jwtSettings)
         {
             LoginResDto loginRes = new LoginResDto();
-            string token = GenerateUserToken(_reqDto.UserName,jwtSettings);
+            string token = GenerateUserToken(reqDto.UserName,jwtSettings);
             if (!string.IsNullOrEmpty(token)){
                 loginRes.AccessToken = token;
-                Login login = new Login { UserName = _reqDto.UserName, IsActive = true };
+                Login login = new Login { UserName = reqDto.UserName, IsActive = true };
                 login = await loginDao.Save(login);
                 if(login.Id > 0)
                     return new DataResponse( true, "token created", loginRes);
