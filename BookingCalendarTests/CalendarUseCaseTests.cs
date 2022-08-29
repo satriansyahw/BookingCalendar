@@ -1,10 +1,12 @@
 ﻿using BookingCalendar.Dto.Request;
+using BookingCalendar.Dto.Response;
 using BookingCalendar.Models.Domain;
 using BookingCalendar.Models.Instance;
 using BookingCalendar.Models.Interface;
 using BookingCalendar.UseCase;
 using BookingCalendar.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -249,6 +251,90 @@ namespace BookingCalendarTests
             //Assert
             Assert.IsFalse(result.IsSuccess);
 
+        }
+        [TestMethod]
+        public void Test_Get_Id_NotFound_Return_DataResponseData_Id_0()
+        {
+            //Arrange
+
+            //Act
+            CalendarUseCase calendarUseCase = new CalendarUseCase();
+
+            DataResponse result = calendarUseCase.Get("satriasmilan",342225).GetAwaiter().GetResult();
+            
+            //Assert
+            Assert.AreEqual(0, ((KalendarResDto)result.Data).Id);
+
+        }
+
+        [TestMethod]
+        public void Test_Get_Id_Found_Return_DataResponseData_Id_Greater_0()
+        {
+            IKalendar calDao = InsKalendar.GetKalendar();
+            //Arrange
+            var currentDate = DateOnly.FromDateTime(DateTime.Now).AddYears(1545).ToString("yyyy-MM-dd");
+            DateOnly.TryParse(currentDate, out DateOnly calDate);
+            Kalendar kalendar = new Kalendar
+            {
+                UserName = "satriamilan",
+                EventName = "myEventName2A1",
+                IsAllDay = false,
+                CalTimeStart = new TimeOnly(00, 15),
+                CallTimeEnd = new TimeOnly(00, 30)
+            };
+            kalendar.CalDate = calDate;
+
+            //Act
+            CalendarUseCase calendarUseCase = new CalendarUseCase();
+            Kalendar kalendarSave = calDao.Save(kalendar).GetAwaiter().GetResult();
+
+            DataResponse result = calendarUseCase.Get("satriamilan", kalendarSave.Id).GetAwaiter().GetResult();
+
+            //Assert
+            Assert.AreEqual(kalendarSave.Id, ((KalendarResDto)result.Data).Id);
+        }
+      
+        [TestMethod]
+        public void Test_Get_NotFoundUserName_Return_DataResponseData_Count_0()
+        {
+            IKalendar calDao = InsKalendar.GetKalendar();
+            //Arrange
+
+            //Act
+            CalendarUseCase calendarUseCase = new CalendarUseCase();
+
+            DataResponse result = calendarUseCase.Get("satrassd23iamilanxx").GetAwaiter().GetResult();
+            var listDataCount = ((IEnumerable)result.Data).Cast<object>().ToList().Count();
+
+            //Assert
+          Assert.AreEqual(0, listDataCount);
+        }
+        [TestMethod]
+        public void Test_Get_FoundUserName_Return_DataResponseData_Count_Greater_0()
+        {
+            IKalendar calDao = InsKalendar.GetKalendar();
+            //Arrange
+            var currentDate = DateOnly.FromDateTime(DateTime.Now).AddYears(1545).ToString("yyyy-MM-dd");
+            DateOnly.TryParse(currentDate, out DateOnly calDate);
+            Kalendar kalendar = new Kalendar
+            {
+                UserName = "satriamilan",
+                EventName = "myEventName2A1",
+                IsAllDay = false,
+                CalTimeStart = new TimeOnly(00, 15),
+                CallTimeEnd = new TimeOnly(00, 30)
+            };
+            kalendar.CalDate = calDate;
+
+            //Act
+            CalendarUseCase calendarUseCase = new CalendarUseCase();
+            Kalendar kalendarSave = calDao.Save(kalendar).GetAwaiter().GetResult();
+
+            DataResponse result = calendarUseCase.Get("satriamilan").GetAwaiter().GetResult();
+            var listDataCount = ((IEnumerable)result.Data).Cast<object>().ToList().Count();
+
+            //Assert
+            Assert.AreNotEqual(0, listDataCount);
         }
 
     }
