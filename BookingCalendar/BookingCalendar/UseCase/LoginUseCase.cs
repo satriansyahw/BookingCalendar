@@ -43,6 +43,9 @@ namespace BookingCalendar.UseCase
             string _keyToken = jwtSettings.IssuerSigningKey;
             int _tokenExpired = jwtSettings.TokenExpiredInMinutes;
 
+            if (string.IsNullOrEmpty(_issuer) | string.IsNullOrEmpty(_keyToken) | _tokenExpired == 0)
+                return String.Empty;
+
             DateTime dt = DateTime.Now;
             var claims = new[] {
             new Claim("un",userName),
@@ -53,10 +56,7 @@ namespace BookingCalendar.UseCase
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            if (!string.IsNullOrEmpty(_issuer)
-                && !string.IsNullOrEmpty(_keyToken)
-                && key != null && claims != null
-                && creds != null)
+            if (key != null && claims != null && creds != null)
             {
                 var token = new JwtSecurityToken(_issuer,
                   _issuer,
