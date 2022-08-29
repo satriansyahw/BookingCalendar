@@ -22,6 +22,7 @@ namespace BookingCalendar.Utils
         }
         public bool IsValidDate(string myDate)
         {
+            if (string.IsNullOrEmpty(myDate)) return false;
             DateOnly.TryParse(myDate, out DateOnly date);
             string myDateCheck = date.ToString("yyyy-MM-dd");
             if (myDate.Trim() == "0001-01-01" | myDateCheck == "0001-01-01")
@@ -31,6 +32,7 @@ namespace BookingCalendar.Utils
         }
         public bool IsValidTime(string myTime)
         {
+            if (string.IsNullOrEmpty(myTime)) return false;
             TimeOnly.TryParse(myTime, out TimeOnly calMyTime);
             string calTimeStartCheck = calMyTime.ToString("HH:mm");
             if (myTime.Trim() != "00:00" && calTimeStartCheck == "00:00")
