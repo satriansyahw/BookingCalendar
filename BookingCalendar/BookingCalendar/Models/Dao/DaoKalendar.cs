@@ -15,20 +15,27 @@ namespace BookingCalendar.Models.Dao
         }).CreateLogger<DaoKalendar>();
         public async Task<bool> Delete(long calendarId)
         {
-            using (var transaction = context.Database.BeginTransaction())
+            if (calendarId > 0)
             {
-                try
+                using (var transaction = context.Database.BeginTransaction())
                 {
-                    Kalendar cal = new Kalendar() { Id = calendarId };
-                    context.Entry(cal).State = EntityState.Deleted;
-                    await context.SaveChangesAsync();
-                    transaction.Commit();
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex.StackTrace);
-                    transaction.Rollback();
+                    try
+                    {
+                        Kalendar? checker = await context.Kalendar.FindAsync(calendarId);
+                        if (checker != null)
+                        {
+                            Kalendar cal = new Kalendar() { Id = calendarId };
+                            context.Entry(cal).State = EntityState.Deleted;
+                            await context.SaveChangesAsync();
+                            transaction.Commit();
+                            return true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex.StackTrace);
+                        transaction.Rollback();
+                    }
                 }
             }
             return false;           
@@ -64,13 +71,14 @@ namespace BookingCalendar.Models.Dao
 
         public async Task<bool> IsAlreadyExist(Kalendar item)
         {
+            List<Kalendar> listCalsss = await (from a in context.Kalendar select a).ToListAsync();
             List<Kalendar> listCalAllDay = await (from a in context.Kalendar
                                   where a.UserName == item.UserName && a.CalDate == item.CalDate
                                   && a.IsAllDay == true
                                   select a).ToListAsync();
             List<Kalendar> listCal = await (from a in context.Kalendar
                                        where a.UserName == item.UserName && a.CalDate == item.CalDate
-                                       && a.CalTimeStart >= item.CalTimeStart && a.CallTimeEnd <= item.CallTimeEnd
+                                       && (a.CalTimeStart.IsBetween(item.CalTimeStart,item.CallTimeEnd) | a.CallTimeEnd.IsBetween(item.CalTimeStart, item.CallTimeEnd))
                                        select a).ToListAsync();
             if(listCalAllDay !=null && listCalAllDay.Count > 0)
                 return true;
@@ -92,18 +100,21 @@ namespace BookingCalendar.Models.Dao
 
         public async Task<Kalendar> Save(Kalendar item)
         {
-            using (var transaction = context.Database.BeginTransaction())
+            if (!string.IsNullOrEmpty(item.UserName) && !string.IsNullOrEmpty(item.EventName))
             {
-                try
+                using (var transaction = context.Database.BeginTransaction())
                 {
-                    context.Add(item);
-                    await context.SaveChangesAsync();
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex.StackTrace);
-                    transaction.Rollback();
+                    try
+                    {
+                        context.Add(item);
+                        await context.SaveChangesAsync();
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex.StackTrace);
+                        transaction.Rollback();
+                    }
                 }
             }
             return item;
@@ -111,24 +122,31 @@ namespace BookingCalendar.Models.Dao
 
         public async Task<Kalendar> Update(Kalendar item)
         {
-            using (var transaction = context.Database.BeginTransaction())
+            if (item.Id > 0 && !string.IsNullOrEmpty(item.UserName) && !string.IsNullOrEmpty(item.EventName))
             {
-                try
+                using (var transaction = context.Database.BeginTransaction())
                 {
-                    context.Attach(item);
-                    context.Entry(item).Property("EventName").IsModified = true;
-                    context.Entry(item).Property("CalDate").IsModified = true;
-                    context.Entry(item).Property("CalTimeStart").IsModified = true;
-                    context.Entry(item).Property("CallTimeEnd").IsModified = true;
-                    context.Entry(item).Property("IsAllDay").IsModified = true;
-                    await context.SaveChangesAsync();
-                    transaction.Commit();
-                    return item;
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex.StackTrace);
-                    transaction.Rollback();
+                    try
+                    {
+                        Kalendar? checker = await context.Kalendar.FindAsync(item.Id);
+                        if (checker != null)
+                        {
+                            context.Attach(item);
+                            context.Entry(item).Property("EventName").IsModified = true;
+                            context.Entry(item).Property("CalDate").IsModified = true;
+                            context.Entry(item).Property("CalTimeStart").IsModified = true;
+                            context.Entry(item).Property("CallTimeEnd").IsModified = true;
+                            context.Entry(item).Property("IsAllDay").IsModified = true;
+                            await context.SaveChangesAsync();
+                            transaction.Commit();
+                            return item;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex.StackTrace);
+                        transaction.Rollback();
+                    }
                 }
             }
             return null;
