@@ -23,15 +23,19 @@ namespace BookingCalendar.UseCase
         public async Task<DataResponse> DoAuthentication(LoginReqDto reqDto,JwtSettings jwtSettings)
         {
             LoginResDto loginRes = new LoginResDto();
-            string token = GenerateUserToken(reqDto.UserName,jwtSettings);
-            if (!string.IsNullOrEmpty(token)){
-                logger.LogInformation("token not empty");
-                loginRes.AccessToken = token;
-                Login login = new Login { UserName = reqDto.UserName, IsActive = true };
-                login = await loginDao.Save(login);
-                logger.LogInformation("token saved __"+login.Id.ToString());
-                if (login.Id > 0)
-                    return new DataResponse( true, "token created", loginRes);
+            if (!string.IsNullOrEmpty(reqDto.UserName))
+            {
+                string token = GenerateUserToken(reqDto.UserName, jwtSettings);
+                if (!string.IsNullOrEmpty(token))
+                {
+                    logger.LogInformation("token not empty");
+                    loginRes.AccessToken = token;
+                    Login login = new Login { UserName = reqDto.UserName, IsActive = true };
+                    login = await loginDao.Save(login);
+                    logger.LogInformation("token saved __" + login.Id.ToString());
+                    if (login.Id > 0)
+                        return new DataResponse(true, "token created", loginRes);
+                }
             }
             return new DataResponse(false, "failed token creation", loginRes);
         }
