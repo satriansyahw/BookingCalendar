@@ -35,7 +35,7 @@ namespace BookingCalendar.UseCase
             KalendarResDto result = this.CalendarResDtoToBuilder(itemResult);
             string existMessage = isAlreadyExists == true ? " but conflict with other events " : string.Empty;
             logger.LogInformation("save calendar " + existMessage.ToString());
-            if (result.Id > 0)
+            if (itemResult.Id > 0)
                 return new DataResponse(true, "Calendar event created " + existMessage, result);
             else
                 return new DataResponse(false, "failed to create Calendar event ", null);
@@ -45,7 +45,7 @@ namespace BookingCalendar.UseCase
             Kalendar itemResult = await calDao.Update(item);
             KalendarResDto result = this.CalendarResDtoToBuilder(itemResult);
             logger.LogInformation("Update calendar ....");
-            if (result != null)
+            if (itemResult != null)
                 return new DataResponse(true, "Calendar  event updated", result);
             else
                 return new DataResponse(false, "failed to update Calendar  event", null);

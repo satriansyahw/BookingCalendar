@@ -23,15 +23,19 @@ namespace BookingCalendar.UseCase
         public async Task<DataResponse> DoAuthentication(LoginReqDto reqDto,JwtSettings jwtSettings)
         {
             LoginResDto loginRes = new LoginResDto();
-            string token = GenerateUserToken(reqDto.UserName,jwtSettings);
-            if (!string.IsNullOrEmpty(token)){
-                logger.LogInformation("token not empty");
-                loginRes.AccessToken = token;
-                Login login = new Login { UserName = reqDto.UserName, IsActive = true };
-                login = await loginDao.Save(login);
-                logger.LogInformation("token saved __"+login.Id.ToString());
-                if (login.Id > 0)
-                    return new DataResponse( true, "token created", loginRes);
+            if (!string.IsNullOrEmpty(reqDto.UserName))
+            {
+                string token = GenerateUserToken(reqDto.UserName, jwtSettings);
+                if (!string.IsNullOrEmpty(token))
+                {
+                    logger.LogInformation("token not empty");
+                    loginRes.AccessToken = token;
+                    Login login = new Login { UserName = reqDto.UserName, IsActive = true };
+                    login = await loginDao.Save(login);
+                    logger.LogInformation("token saved __" + login.Id.ToString());
+                    if (login.Id > 0)
+                        return new DataResponse(true, "token created", loginRes);
+                }
             }
             return new DataResponse(false, "failed token creation", loginRes);
         }
@@ -43,6 +47,9 @@ namespace BookingCalendar.UseCase
             string _keyToken = jwtSettings.IssuerSigningKey;
             int _tokenExpired = jwtSettings.TokenExpiredInMinutes;
 
+            if (string.IsNullOrEmpty(_issuer) | string.IsNullOrEmpty(_keyToken) | _tokenExpired == 0)
+                return String.Empty;
+
             DateTime dt = DateTime.Now;
             var claims = new[] {
             new Claim("un",userName),
@@ -53,10 +60,7 @@ namespace BookingCalendar.UseCase
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            if (!string.IsNullOrEmpty(_issuer)
-                && !string.IsNullOrEmpty(_keyToken)
-                && key != null && claims != null
-                && creds != null)
+            if (key != null && claims != null && creds != null)
             {
                 var token = new JwtSecurityToken(_issuer,
                   _issuer,
