@@ -1,6 +1,7 @@
 ﻿using BookingCalendar.Dto.Response;
 using BookingCalendar.Models.Domain;
 using BookingCalendar.Models.Interface;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
@@ -106,11 +107,17 @@ namespace BookingCalendar.Models.Dao
                 {
                     try
                     {
+                        Event events = new Event();
+                        events.EventCode = "code";
+                        events.EventName =  "name";
+                        context.Add(events);
+                        item.EventId = events.Id;
                         context.Add(item);
                         await context.SaveChangesAsync();
                         transaction.Commit();
                     }
                     catch (Exception ex)
+
                     {
                         logger.LogError(ex.StackTrace);
                         transaction.Rollback();
@@ -150,6 +157,29 @@ namespace BookingCalendar.Models.Dao
                 }
             }
             return null;
+        }
+
+        public async Task<KalEventResDto> Getx(string userName, long calendarId)
+        {
+            var ev = from a in context.Event select a;
+            var calev = from a in context.Kalendar select a.Evening;
+            var calev2 = from a in context.Kalendar select a;
+            var cal = await (from a in context.Kalendar
+                             join b in context.Event on a.EventId equals b.Id
+                             where a.UserName == userName && a.Id == calendarId
+                             select new KalEventResDto
+                             {
+                                 CalDate = a.CalDate.ToString("yyyy-MM-dd"),
+                                 EventCode = b.EventCode,
+                                 EventId = a.EventId
+                               ,
+                                 EventName = b.EventName,
+                                 Id = a.Id,
+                                 IsAllDay = a.IsAllDay,
+                                 UserName = a.UserName
+                             }).FirstOrDefaultAsync();
+
+            return cal;
         }
     }
 

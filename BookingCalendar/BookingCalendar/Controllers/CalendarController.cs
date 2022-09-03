@@ -38,6 +38,22 @@ namespace BookingCalendar.Controllers
             string userName = gh.GetAuthInfo(this.HttpContext);
             return await calUseCase.Get(userName);
         }
+        [HttpGet]
+        [Route("Getx/{calendarId}")]
+        public async Task<DataResponse> Getx(long calendarId)
+        {
+            logger.LogInformation("Get data Calendar By User name___"+calendarId.ToString());
+            string userName = gh.GetAuthInfo(this.HttpContext);
+            return await calUseCase.Getx(userName,calendarId);
+        }
+        [HttpGet]
+        [Route("Gety")]
+        public async Task<DataResponse> Gety([FromQuery]long calendarId)
+        {
+            logger.LogInformation("Get data Calendar By User name___xxx" + calendarId.ToString());
+            string userName = gh.GetAuthInfo(this.HttpContext);
+            return await calUseCase.Getx(userName,calendarId);
+        }
 
         [HttpPatch]
         public async Task<DataResponse> Patch([FromBody] KalendarWithIdReqDto dto)

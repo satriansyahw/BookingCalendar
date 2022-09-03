@@ -1,4 +1,6 @@
-﻿namespace BookingCalendar.Models.Domain
+﻿using Microsoft.Extensions.Hosting;
+
+namespace BookingCalendar.Models.Domain
 {
     public class Kalendar
     {
@@ -10,6 +12,9 @@
         public TimeOnly CalTimeStart { get; set; }
         public TimeOnly CallTimeEnd { get; set; }
         public bool IsAllDay { get; set; } = false;
+        public long EventId { get; set; }
+
+        public Event? Evening { get; set; }
 
     }
 }

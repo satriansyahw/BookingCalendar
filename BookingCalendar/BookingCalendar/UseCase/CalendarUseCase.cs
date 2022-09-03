@@ -148,5 +148,12 @@ namespace BookingCalendar.UseCase
             }
             return result;
         }
+        public async Task<DataResponse> Getx(string userName,long calendarId)
+        {
+            KalEventResDto result = await calDao.Getx(userName,calendarId);
+            return new DataResponse(true, "Get all data by username", result);
+
+
+        }
     }
 }

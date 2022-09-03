@@ -10,6 +10,7 @@ namespace BookingCalendar.Models.Interface
         Task<bool> IsAlreadyExist(Kalendar item);
         Task<bool> Delete(long calendarId);
         Task<Kalendar> Get(string userName, long calendarId);
+        Task<KalEventResDto> Getx(string userName, long calendarId);
         Task<List<KalendarResDto>> Get(string userName);
         Task<bool> IsAlreadyExistByEventName(string userName, string eventName);
     }
