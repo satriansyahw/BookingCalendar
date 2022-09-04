@@ -13,14 +13,14 @@ using System.Text;
 
 namespace BookingCalendar.UseCase
 {
-    public class LoginUseCase
+    public class LoginUseCase:ILoginUseCase
     {
         ILogin loginDao = InsLogin.GetLogin();
         private readonly ILogger logger = LoggerFactory.Create(config =>
         {
             config.AddConsole();
         }).CreateLogger<LoginUseCase>();
-        public async Task<DataResponse> DoAuthentication(LoginReqDto reqDto,JwtSettings jwtSettings)
+        public async virtual Task<DataResponse> DoAuthentication(LoginReqDto reqDto,JwtSettings jwtSettings)
         {
             LoginResDto loginRes = new LoginResDto();
             if (!string.IsNullOrEmpty(reqDto.UserName))
