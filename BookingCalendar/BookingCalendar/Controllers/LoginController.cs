@@ -14,13 +14,14 @@ namespace BookingCalendar.Controllers
     [Authorize]
     public class LoginController : ControllerBase
     {
-        LoginUseCase loginUseCase = new LoginUseCase();
+        private ILoginUseCase loginUseCase;
         private readonly JwtSettings jwtSettings;
         private readonly ILogger logger;
-        public LoginController(JwtSettings jwtSettings, ILoggerFactory _logger)
+        public LoginController(JwtSettings jwtSettings, ILoggerFactory _logger,ILoginUseCase loginUseCase)
         {
             this.jwtSettings = jwtSettings;
             this.logger = _logger.CreateLogger<LoginController>();
+            this.loginUseCase = loginUseCase;
         }
 
         [HttpPost]
@@ -29,6 +30,14 @@ namespace BookingCalendar.Controllers
         {
             this.logger.LogInformation("Authenticating process ...");
            return  await loginUseCase.DoAuthentication(loginDto,this.jwtSettings);
+        }
+
+        [HttpPost]
+        [Route("refresh")]
+        public async Task<DataResponse> Refresh([FromBody] LoginReqDto loginDto)
+        {
+            this.logger.LogInformation("Authenticating process ...");
+            return await loginUseCase.DoAuthentication(loginDto, this.jwtSettings);
         }
 
 

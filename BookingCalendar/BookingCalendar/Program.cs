@@ -1,5 +1,7 @@
 using BookingCalendar.Extensions;
 using BookingCalendar.Models;
+using BookingCalendar.Models.Dao;
+using BookingCalendar.Models.Interface;
 using BookingCalendar.UseCase;
 using BookingCalendar.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,9 @@ builder.Services.AddJWTTokenServices(builder.Configuration);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
+
+builder.Services.AddSingleton<ILoginUseCase, LoginUseCase>();
+builder.Services.AddTransient<ILogin, DaoLogin>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

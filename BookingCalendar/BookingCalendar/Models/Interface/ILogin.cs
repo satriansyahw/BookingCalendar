@@ -5,6 +5,8 @@ namespace BookingCalendar.Models.Interface
 	{
 		Task<Login> Save(Login item);
 		Task<bool> IsLoginIn(string userName);
-	}
+
+        Task<bool> IsLoginIn(string userName,string refreshToken);
+    }
 }
 

@@ -27,12 +27,25 @@ namespace BookingCalendar.Models.Dao
 
         }
 
-        public async Task<Login> Save(Login item)
+        public async Task<bool> IsLoginIn(string userName,string refreshToken)
+        {
+            var cari = await (from a in context.Login
+                              where a.UserName.Equals(userName) && a.RefreshToken.Equals(refreshToken)
+                              select a).ToListAsync();
+            logger.LogInformation("checking is loginIn..." + cari.Count.ToString());
+            if (!cari.IsNullOrEmpty<Login>())
+                return true;
+            else
+                return false;
+        }
+
+            public async Task<Login> Save(Login item)
         {
             using (var transaction = context.Database.BeginTransaction())
             {
                 try
                 {
+                    logger.LogInformation("data", item);
                     context.Add(item);
                     await context.SaveChangesAsync();
                     transaction.Commit();

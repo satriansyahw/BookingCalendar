@@ -12,6 +12,11 @@
             get;
             set;
         }
+        public string IssuerSigningKeyRefresh
+        {
+            get;
+            set;
+        }
         public bool ValidateIssuer
         {
             get;
@@ -43,6 +48,11 @@
             set;
         } = true;
         public int TokenExpiredInMinutes
+        {
+            get;
+            set;
+        }
+        public int TokenExpiredInMinutesRefresh
         {
             get;
             set;

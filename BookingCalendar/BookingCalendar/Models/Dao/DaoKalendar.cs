@@ -162,8 +162,7 @@ namespace BookingCalendar.Models.Dao
         public async Task<KalEventResDto> Getx(string userName, long calendarId)
         {
             var ev = from a in context.Event select a;
-            var calev = from a in context.Kalendar select a.Evening;
-            var calev2 = from a in context.Kalendar select a;
+            var calev2 = (from a in context.Kalendar select a);
             var cal = await (from a in context.Kalendar
                              join b in context.Event on a.EventId equals b.Id
                              where a.UserName == userName && a.Id == calendarId
@@ -174,6 +173,28 @@ namespace BookingCalendar.Models.Dao
                                  EventId = a.EventId
                                ,
                                  EventName = b.EventName,
+                                 Id = a.Id,
+                                 IsAllDay = a.IsAllDay,
+                                 UserName = a.UserName
+                             }).FirstOrDefaultAsync();
+
+            return cal;
+        }
+        public async Task<KalEventResDto> Gety(string userName, long calendarId)
+        {
+            var ev = from a in context.Event select a;
+            var calev2 = (from a in context.Kalendar select a);
+            var cal = await (from a in context.Kalendar
+                             join b in context.Event on a.EventId equals b.Id into tempTable
+                             where a.UserName == userName && a.Id == calendarId
+                             from temp in tempTable
+                             select new KalEventResDto
+                             {
+                                 CalDate = a.CalDate.ToString("yyyy-MM-dd"),
+                                 EventCode = temp.EventCode,
+                                 EventId = a.EventId
+                               ,
+                                 EventName = temp.EventName,
                                  Id = a.Id,
                                  IsAllDay = a.IsAllDay,
                                  UserName = a.UserName

@@ -52,7 +52,7 @@ namespace BookingCalendar.Controllers
         {
             logger.LogInformation("Get data Calendar By User name___xxx" + calendarId.ToString());
             string userName = gh.GetAuthInfo(this.HttpContext);
-            return await calUseCase.Getx(userName,calendarId);
+            return await calUseCase.Gety(userName,calendarId);
         }
 
         [HttpPatch]

@@ -13,25 +13,34 @@ using System.Text;
 
 namespace BookingCalendar.UseCase
 {
-    public class LoginUseCase
+    public class LoginUseCase:ILoginUseCase
     {
-        ILogin loginDao = InsLogin.GetLogin();
+        ILogin loginDao;//= InsLogin.GetLogin();
         private readonly ILogger logger = LoggerFactory.Create(config =>
         {
             config.AddConsole();
         }).CreateLogger<LoginUseCase>();
+
+        public LoginUseCase(ILogin loginDao)
+        {
+            this.loginDao = loginDao;
+            this.logger = logger;
+        }
+
         public async Task<DataResponse> DoAuthentication(LoginReqDto reqDto,JwtSettings jwtSettings)
         {
             LoginResDto loginRes = new LoginResDto();
             if (!string.IsNullOrEmpty(reqDto.UserName))
             {
-                string token = GenerateUserToken(reqDto.UserName, jwtSettings);
-                if (!string.IsNullOrEmpty(token))
+                string token = GenerateUserToken(reqDto.UserName, jwtSettings,true);
+                string tokenRefresh = GenerateUserToken(reqDto.UserName, jwtSettings,false);
+                if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(tokenRefresh))
                 {
                     logger.LogInformation("token not empty");
                     loginRes.AccessToken = token;
-                    Login login = new Login { UserName = reqDto.UserName, IsActive = true };
-                    login = await loginDao.Save(login);
+                    loginRes.RefreshToken = tokenRefresh;
+                    Login login = new Login { UserName = reqDto.UserName, IsActive = true,RefreshToken=tokenRefresh };
+                    login =  await loginDao.Save(login);
                     logger.LogInformation("token saved __" + login.Id.ToString());
                     if (login.Id > 0)
                         return new DataResponse(true, "token created", loginRes);
@@ -39,13 +48,13 @@ namespace BookingCalendar.UseCase
             }
             return new DataResponse(false, "failed token creation", loginRes);
         }
-        private string GenerateUserToken(string userName, JwtSettings jwtSettings)
+        private string GenerateUserToken(string userName, JwtSettings jwtSettings,bool isAccessToken)
         {
             logger.LogInformation("starting create token ");
             var now = DateTime.UtcNow;
             string _issuer = jwtSettings.ValidIssuer;
-            string _keyToken = jwtSettings.IssuerSigningKey;
-            int _tokenExpired = jwtSettings.TokenExpiredInMinutes;
+            string _keyToken = isAccessToken? jwtSettings.IssuerSigningKey:jwtSettings.IssuerSigningKeyRefresh;
+            int _tokenExpired = isAccessToken? jwtSettings.TokenExpiredInMinutes:jwtSettings.TokenExpiredInMinutesRefresh;
 
             if (string.IsNullOrEmpty(_issuer) | string.IsNullOrEmpty(_keyToken) | _tokenExpired == 0)
                 return String.Empty;

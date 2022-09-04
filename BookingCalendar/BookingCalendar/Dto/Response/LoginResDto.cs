@@ -4,8 +4,10 @@ namespace BookingCalendar.Dto.Response
 {
 	public class LoginResDto
     {
-		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-		public string AccessToken { get; set; }
-	}
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string AccessToken { get; set; } = null!;
+
+        public string RefreshToken { get; set; } = null!;
+    }
 }
 
