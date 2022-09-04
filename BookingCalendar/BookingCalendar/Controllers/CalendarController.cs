@@ -12,7 +12,7 @@ namespace BookingCalendar.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("MyCorsPolicy")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class CalendarController : ControllerBase
     {
         CalendarUseCase calUseCase = new CalendarUseCase();

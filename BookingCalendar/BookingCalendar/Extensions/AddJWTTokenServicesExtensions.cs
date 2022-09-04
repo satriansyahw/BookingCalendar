@@ -19,28 +19,30 @@ namespace BookingCalendar.Extensions
             Services.AddSingleton(bindJwtSettings);
 
 
-            Services.AddAuthentication(options => {
+            Services.AddAuthentication(options =>
+            {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options => {
-                options.SaveToken = true;
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
-                {
-                    ValidateIssuerSigningKey = bindJwtSettings.ValidateIssuerSigningKey,
-                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(bindJwtSettings.IssuerSigningKey)),
-                    ValidateIssuer = bindJwtSettings.ValidateIssuer,
-                    ValidIssuer = bindJwtSettings.ValidIssuer,
-                    ValidateAudience = bindJwtSettings.ValidateAudience,
-                    ValidAudience = bindJwtSettings.ValidAudience,
-                    RequireExpirationTime = bindJwtSettings.RequireExpirationTime,
-                    ValidateLifetime = bindJwtSettings.RequireExpirationTime,
-                    ClockSkew = TimeSpan.FromDays(1),
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = AdditionalValidation
-                };
             });
+            //.AddJwtBearer(options => {
+            //    options.SaveToken = true;
+            //    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+            //    {
+            //        ValidateIssuerSigningKey = bindJwtSettings.ValidateIssuerSigningKey,
+            //        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(bindJwtSettings.IssuerSigningKey)),
+            //        ValidateIssuer = bindJwtSettings.ValidateIssuer,
+            //        ValidIssuer = bindJwtSettings.ValidIssuer,
+            //        ValidateAudience = bindJwtSettings.ValidateAudience,
+            //        ValidAudience = bindJwtSettings.ValidAudience,
+            //        RequireExpirationTime = bindJwtSettings.RequireExpirationTime,
+            //        ValidateLifetime = bindJwtSettings.RequireExpirationTime,
+            //        ClockSkew = TimeSpan.FromDays(1),
+            //    };
+            //    options.Events = new JwtBearerEvents
+            //    {
+            //        OnTokenValidated = AdditionalValidation
+            //    };
+            //});
         }
         static  Task AdditionalValidation(TokenValidatedContext context)
         {
