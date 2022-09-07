@@ -69,7 +69,7 @@ namespace BookingCalendar.Models.Dao
             return listCall;
         }
 
-        public async Task<bool> IsAlreadyExist(Kalendar item)
+        public async virtual Task<bool> IsAlreadyExist(Kalendar item)
         {
             List<Kalendar> listCalsss = await (from a in context.Kalendar select a).ToListAsync();
             List<Kalendar> listCalAllDay = await (from a in context.Kalendar
@@ -88,7 +88,7 @@ namespace BookingCalendar.Models.Dao
             return false;
         }
 
-        public async Task<bool> IsAlreadyExistByEventName(string userName, string eventName)
+        public async virtual Task<bool> IsAlreadyExistByEventName(string userName, string eventName)
         {
             var cal = await(from a in context.Kalendar
                             where a.UserName == userName && a.EventName.Trim().ToLower() == eventName.Trim().ToLower()
@@ -98,7 +98,7 @@ namespace BookingCalendar.Models.Dao
             return false;
         }
 
-        public async Task<Kalendar> Save(Kalendar item)
+        public async virtual Task<Kalendar> Save(Kalendar item)
         {
             if (!string.IsNullOrEmpty(item.UserName) && !string.IsNullOrEmpty(item.EventName))
             {

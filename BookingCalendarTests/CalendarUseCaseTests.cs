@@ -1,13 +1,16 @@
 ﻿using BookingCalendar.Dto.Request;
 using BookingCalendar.Dto.Response;
+using BookingCalendar.Models.Dao;
 using BookingCalendar.Models.Domain;
 using BookingCalendar.Models.Instance;
 using BookingCalendar.Models.Interface;
 using BookingCalendar.UseCase;
 using BookingCalendar.Utils;
+using Moq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +20,29 @@ namespace BookingCalendarTests
     [TestClass]
     public class CalendarUseCaseTests
     {
-       
+
+        [TestMethod]
+        public void Test_Mock_Save_KalendarEmpty_Return_DataResponseIsSuccess_True()
+        {
+            //Arrange
+            var mockKalendar = new Mock<Kalendar>();
+            var mockCalUseCase = new Mock<CalendarUseCase>();
+            var mockCalDao = new Mock<IKalendar> ();
+
+
+            //Act
+            Kalendar mockCalDaoSave = new Kalendar { Id = 1,UserName="satriamilan" };
+            mockCalDao.Setup(a => a.IsAlreadyExist(mockKalendar.Object)).Returns(Task.FromResult<bool>(true));
+            mockCalDao.Setup(a => a.Save(mockKalendar.Object)).Returns(Task.FromResult<Kalendar>(mockCalDaoSave));
+
+
+            CalendarUseCase calendarUseCase = new CalendarUseCase(mockCalDao.Object);
+            DataResponse result = calendarUseCase.Save(mockKalendar.Object).GetAwaiter().GetResult();
+
+            //Assert
+            Assert.IsTrue(result.IsSuccess);
+
+        }
 
         [TestMethod]
         public void Test_Save0_KalendarEmpty_Return_DataResponseIsSuccess_False()

@@ -10,8 +10,16 @@ namespace BookingCalendar.UseCase
 {
     public class CalendarUseCase
     {
-        IKalendar calDao = InsKalendar.GetKalendar();
+        private IKalendar calDao;
 
+        public CalendarUseCase(IKalendar kalendar)
+        {
+            this.calDao = kalendar;
+        }
+        public CalendarUseCase()
+        {
+            calDao = InsKalendar.GetKalendar();
+        }
         private readonly ILogger logger = LoggerFactory.Create(config =>
         {
             config.AddConsole();
@@ -28,7 +36,7 @@ namespace BookingCalendar.UseCase
             else
                 return new GenericResponse(false, "Event Date & time conflicts");
         }
-        public async Task<DataResponse> Save(Kalendar item)
+        public async virtual Task<DataResponse> Save(Kalendar item)
         {
             bool isAlreadyExists = await calDao.IsAlreadyExist(item);
             Kalendar itemResult = await calDao.Save(item);
